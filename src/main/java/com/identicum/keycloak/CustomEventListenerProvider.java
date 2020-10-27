@@ -18,6 +18,7 @@ import java.util.Map;
 public class CustomEventListenerProvider implements EventListenerProvider {
 
 	private static final Logger logger = Logger.getLogger(CustomEventListenerProvider.class);
+	private static final String SSO_ID_ATTRIBUTE = "ssoId";
 	private KeycloakSession session;
 	private RemoteSsoHandler handler;
 
@@ -31,16 +32,18 @@ public class CustomEventListenerProvider implements EventListenerProvider {
 	public void onEvent(Event event) {
 		logger.tracev("onEvent: {0}", toString(event));
 		if(EventType.REGISTER.equals(event.getType())) {
-			logger.infov("Matched realm: {0}", event.getRealmId());
 			String username = event.getDetails().get("username");
 			logger.infov("Username created: {0}", username);
-			try {
-				JsonObject response = this.handler.registerUser(username, event.getRealmId());
-				RealmModel realm = session.realms().getRealm(event.getRealmId());
-				UserModel user = session.users().getUserById(event.getUserId(), realm);
-				user.setSingleAttribute("ssoId", response.get("user").asJsonObject().getString("id"));
-			} catch (Exception e) {
-				logger.errorv("Error registering user {0}: ", username, e);
+			this.registerAndUpdateUser(username, event);
+		}
+		else if(EventType.LOGIN.equals(event.getType())) {
+			String username = event.getDetails().get("username");
+			logger.infov("User logged in: {0}", username);
+			RealmModel realm = session.realms().getRealm(event.getRealmId());
+			UserModel user = session.users().getUserById(event.getUserId(), realm);
+			List<String> ssoIdValue = user.getAttribute(SSO_ID_ATTRIBUTE);
+			if(ssoIdValue == null || ssoIdValue.isEmpty()) {
+				this.registerAndUpdateUser(username, event);
 			}
 		}
 	}
@@ -53,6 +56,17 @@ public class CustomEventListenerProvider implements EventListenerProvider {
 	@Override
 	public void close() {
 
+	}
+
+	private void registerAndUpdateUser(String username, Event event) {
+		try {
+			JsonObject response = this.handler.registerUser(username, event.getRealmId());
+			RealmModel realm = session.realms().getRealm(event.getRealmId());
+			UserModel user = session.users().getUserById(event.getUserId(), realm);
+			user.setSingleAttribute(SSO_ID_ATTRIBUTE, response.get("user").asJsonObject().getString("id"));
+		} catch (Exception e) {
+			logger.errorv("Error registering user {0}: ", username, e);
+		}
 	}
 
 	private String toString(Event event) {

@@ -47,7 +47,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>keycloak-mx-listener</finalName>
+		<finalName>keycloak-custom-listener</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
