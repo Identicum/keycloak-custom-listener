@@ -1,0 +1,14 @@
+embed-server --server-config=standalone-ha.xml --std-out=echo
+
+
+/subsystem=logging/logger=com.identicum.keycloak:add
+/subsystem=logging/logger=com.identicum.keycloak:write-attribute(name="level", value=DEBUG)
+
+/subsystem=keycloak-server/spi=eventsListener/:add
+/subsystem=keycloak-server/spi=eventsListener/provider=custom-event-listener/:add(enabled=true)
+/subsystem=keycloak-server/spi=eventsListener/provider=custom-event-listener/:map-put(name=properties,key=apiEndpoint,value=${env.API_ENDPOINT})
+/subsystem=keycloak-server/spi=eventsListener/provider=custom-event-listener/:map-put(name=properties,key=apiMaxConnections,value=${env.API_MAXCONNECTIONS:50})
+/subsystem=keycloak-server/spi=eventsListener/provider=custom-event-listener/:map-put(name=properties,key=apiTimeout,value=${env.API_TIMEOUT:2000})
+
+
+stop-embedded-server
