@@ -11,6 +11,7 @@
         <properties>
             <property name="apiEndpoint" value="https://e5fdaf1155f7a2e9feeae00b482ae056.m.pipedream.net"/>
             <property name="apiMaxConnections" value="10"/>
+            <property name="apiTimeout" value="2000"/>
         </properties>
     </provider>
 </spi>
