@@ -37,19 +37,9 @@ public class RemoteSsoHandler {
 		httpPost.setHeader("Content-Type", "application/json");
 
 		JsonObjectBuilder builder = Json.createObjectBuilder();
-		builder.add("source", "AUP");
 		builder.add("user" , Json.createObjectBuilder()
 			.add("loginname", Json.createArrayBuilder().add(username).build())
-			.add("locale", getLocaleByRealm(realm))
 			.build()
-		);
-		builder.add("parameters", Json.createArrayBuilder()
-			.add(Json.createObjectBuilder()
-					.add("key", "Version")
-					.add("value", "Legacy")
-					.add("class", "java.lang.String")
-					.build()
-			).build()
 		);
 
 		JsonObject requestJson = builder.build();
@@ -62,16 +52,4 @@ public class RemoteSsoHandler {
 		return response.getResponseAsJsonObject();
 	}
 
-	private String getLocaleByRealm(String realm) {
-		switch (realm){
-			case "claro":
-				return "es-AR";
-			case "claro-py":
-				return "es-PY";
-			case "claro-uy":
-				return "es-UY";
-			default:
-				return "es-AR";
-		}
-	}
 }
