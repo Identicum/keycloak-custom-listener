@@ -1,8 +1,11 @@
 package com.identicum.http;
 
+import java.net.SocketTimeoutException;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
@@ -36,8 +39,21 @@ public class HttpTools {
 			logger.debugv("Response body obtained from server: {0}", responseString);
 			return new SimpleHttpResponse(response.getStatusLine().getStatusCode(), responseString);
 		}
+		catch(ConnectionPoolTimeoutException cpte) {
+			logger.errorv("Connection pool timeout exception: {0}", cpte);
+			throw new RuntimeException("Connection pool timeout exception.", cpte);
+		}
+		catch(ConnectTimeoutException cte) {
+			logger.errorv("Connect timeout exception: {0}", cte);
+			throw new RuntimeException("Connect timeout exception.", cte);
+		}
+		catch(SocketTimeoutException ste) {
+			logger.errorv("Socket timeout exception: {0}", ste);
+			throw new RuntimeException("Socket timeout exception.", ste);
+		}
 		catch(IOException io) {
-			throw new RuntimeException("Error executing request", io);
+			logger.errorv("Error executing request: {0}", io);
+			throw new RuntimeException("Error executing request.", io);
 		}
 		finally {
 			closeQuietly(response);
