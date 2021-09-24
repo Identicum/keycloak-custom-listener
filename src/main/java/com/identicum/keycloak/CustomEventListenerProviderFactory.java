@@ -1,6 +1,7 @@
 package com.identicum.keycloak;
 
 import com.identicum.http.HttpTools;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -27,18 +28,28 @@ public class CustomEventListenerProviderFactory implements EventListenerProvider
 	public void init(Config.Scope config) {
 		String endpoint = config.get("apiEndpoint");
 		Integer maxConnections = config.getInt("apiMaxConnections", 10);
-		Integer timeout = config.getInt("apiTimeout", 2000);
-		logger.infov("Initializing HTTP pool with API endpoint: {0}, maxConnections: {1}, timeout: {2}", endpoint, maxConnections, timeout);
+		Integer connectionRequestTimeout = config.getInt("apiConnectionRequestTimeout", 2000);
+		Integer connectTimeout = config.getInt("apiConnectTimeout", 2000);
+		Integer socketTimeout = config.getInt("apiSocketTimeout", 2000);
+		logger.infov("Initializing HTTP pool with API endpoint: {0}, maxConnections: {1}, connectionRequestTimeout: {2}, connectTimeout: {3}, socketTimeout: {4}", endpoint, maxConnections, connectionRequestTimeout, connectTimeout, socketTimeout);
 		PoolingHttpClientConnectionManager poolingConnManager = new PoolingHttpClientConnectionManager();
 		poolingConnManager.setDefaultMaxPerRoute(maxConnections);
-		poolingConnManager.setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(timeout).build());
-		CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(poolingConnManager).build();
+		poolingConnManager.setDefaultSocketConfig(SocketConfig.custom()
+			.setSoTimeout(socketTimeout)
+			.build());
+		RequestConfig requestConfig = RequestConfig.custom()
+			.setConnectTimeout(connectTimeout)
+			.setConnectionRequestTimeout(connectionRequestTimeout)
+			.build();
+		CloseableHttpClient httpClient = HttpClients.custom()
+			.setDefaultRequestConfig(requestConfig)
+			.setConnectionManager(poolingConnManager)
+			.build();
 		this.remoteSsoHandler = new RemoteSsoHandler(httpClient, endpoint);
 	}
 
 	@Override
 	public void postInit(KeycloakSessionFactory keycloakSessionFactory) {
-
 	}
 
 	@Override

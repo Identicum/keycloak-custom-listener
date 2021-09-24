@@ -7,8 +7,9 @@ embed-server --server-config=standalone-ha.xml --std-out=echo
 /subsystem=keycloak-server/spi=eventsListener/:add
 /subsystem=keycloak-server/spi=eventsListener/provider=custom-event-listener/:add(enabled=true)
 /subsystem=keycloak-server/spi=eventsListener/provider=custom-event-listener/:map-put(name=properties,key=apiEndpoint,value=${env.API_ENDPOINT})
-/subsystem=keycloak-server/spi=eventsListener/provider=custom-event-listener/:map-put(name=properties,key=apiMaxConnections,value=${env.API_MAXCONNECTIONS:50})
-/subsystem=keycloak-server/spi=eventsListener/provider=custom-event-listener/:map-put(name=properties,key=apiTimeout,value=${env.API_TIMEOUT:2000})
-
+/subsystem=keycloak-server/spi=eventsListener/provider=custom-event-listener/:map-put(name=properties,key=apiMaxConnections,value=${env.API_MAX_CONNECTIONS:15})
+/subsystem=keycloak-server/spi=eventsListener/provider=custom-event-listener/:map-put(name=properties,key=apiSocketTimeout,value=${env.API_SOCKET_TIMEOUT:4500})
+/subsystem=keycloak-server/spi=eventsListener/provider=custom-event-listener/:map-put(name=properties,key=apiConnectTimeout,value=${env.API_CONNECT_TIMEOUT:1000})
+/subsystem=keycloak-server/spi=eventsListener/provider=custom-event-listener/:map-put(name=properties,key=apiConnectionRequestTimeout,value=${env.API_CONNECTION_REQUEST_TIMEOUT:1000})
 
 stop-embedded-server

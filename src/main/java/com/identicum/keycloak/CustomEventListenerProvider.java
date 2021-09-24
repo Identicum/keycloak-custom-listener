@@ -30,27 +30,22 @@ public class CustomEventListenerProvider implements EventListenerProvider {
 
 	@Override
 	public void onEvent(Event event) {
-		logger.tracev("onEvent: {0}", toString(event));
+		logger.debugv("onEvent(Event): {0}", toString(event));
 		if(EventType.REGISTER.equals(event.getType())) {
 			String username = event.getDetails().get("username");
 			logger.infov("Username created: {0}", username);
-			this.registerAndUpdateUser(username, event);
+			this.publishEvent(username, event);
 		}
 		else if(EventType.LOGIN.equals(event.getType())) {
 			String username = event.getDetails().get("username");
-			logger.infov("User logged in: {0}", username);
-			RealmModel realm = session.realms().getRealm(event.getRealmId());
-			UserModel user = session.users().getUserById(event.getUserId(), realm);
-			List<String> ssoIdValue = user.getAttribute(SSO_ID_ATTRIBUTE);
-			if(ssoIdValue == null || ssoIdValue.isEmpty()) {
-				this.registerAndUpdateUser(username, event);
-			}
+			logger.debugv("User logged in: {0}", username);
+			this.publishEvent(username, event);
 		}
 	}
 
 	@Override
 	public void onEvent(AdminEvent adminEvent, boolean includeRepresentation) {
-		logger.tracev("onEvent (admin): {0}", toString(adminEvent));
+		logger.tracev("onEvent (AdminEvent): {0}", toString(adminEvent));
 	}
 
 	@Override
@@ -58,14 +53,11 @@ public class CustomEventListenerProvider implements EventListenerProvider {
 
 	}
 
-	private void registerAndUpdateUser(String username, Event event) {
+	private void publishEvent(String username, Event event) {
 		try {
 			JsonObject response = this.handler.registerUser(username, event.getRealmId());
-			RealmModel realm = session.realms().getRealm(event.getRealmId());
-			UserModel user = session.users().getUserById(event.getUserId(), realm);
-			user.setSingleAttribute(SSO_ID_ATTRIBUTE, response.get("user").asJsonObject().getString("id"));
 		} catch (Exception e) {
-			logger.errorv("Error registering user {0}: ", username, e);
+			logger.errorv("Error publishing user event {0}: {1}", username, e);
 		}
 	}
 

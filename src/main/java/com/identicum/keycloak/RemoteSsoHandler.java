@@ -43,12 +43,15 @@ public class RemoteSsoHandler {
 		);
 
 		JsonObject requestJson = builder.build();
-		logger.infov("Setting create body as: {0}", requestJson.toString());
+		logger.debugv("Setting create body as: {0}", requestJson.toString());
 		HttpEntity httpEntity = new ByteArrayEntity(requestJson.toString().getBytes());
 		httpPost.setEntity(httpEntity);
 
+		logger.debugv("Executing call for user {0}", username);
 		SimpleHttpResponse response = HttpTools.executeCall(this.httpClient, httpPost);
+		logger.debugv("Checking response for user {0}", username);
 		HttpTools.stopOnError(response);
+		logger.debugv("Returning response for user {0}", username);
 		return response.getResponseAsJsonObject();
 	}
 
