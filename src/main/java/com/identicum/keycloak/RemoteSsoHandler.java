@@ -1,5 +1,8 @@
 package com.identicum.keycloak;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import com.identicum.http.HttpTools;
 import com.identicum.http.SimpleHttpResponse;
 import org.apache.http.HttpEntity;
@@ -8,10 +11,6 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HTTP;
 import org.jboss.logging.Logger;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 
 public class RemoteSsoHandler {
 
@@ -28,7 +27,7 @@ public class RemoteSsoHandler {
 	public CloseableHttpClient getHttpClient() {
 		return httpClient;
 	}
-
+	
 	public JsonObject registerUser(String username, String realm) {
 		logger.infov("Registering user {0}", username);
 
