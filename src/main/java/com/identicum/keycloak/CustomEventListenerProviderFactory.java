@@ -33,6 +33,7 @@ public class CustomEventListenerProviderFactory implements EventListenerProvider
 		Integer socketTimeout = config.getInt("apiSocketTimeout", 2000);
 		logger.infov("Initializing HTTP pool with API endpoint: {0}, maxConnections: {1}, connectionRequestTimeout: {2}, connectTimeout: {3}, socketTimeout: {4}", endpoint, maxConnections, connectionRequestTimeout, connectTimeout, socketTimeout);
 		PoolingHttpClientConnectionManager poolingConnManager = new PoolingHttpClientConnectionManager();
+		poolingConnManager.setMaxTotal(maxConnections);
 		poolingConnManager.setDefaultMaxPerRoute(maxConnections);
 		poolingConnManager.setDefaultSocketConfig(SocketConfig.custom()
 			.setSoTimeout(socketTimeout)

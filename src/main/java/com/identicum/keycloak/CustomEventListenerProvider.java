@@ -1,24 +1,18 @@
 package com.identicum.keycloak;
 
+import java.util.Map;
+import javax.json.JsonObject;
 import org.jboss.logging.Logger;
 import org.keycloak.events.Event;
 import org.keycloak.events.EventListenerProvider;
 import org.keycloak.events.EventType;
 import org.keycloak.events.admin.AdminEvent;
-import org.keycloak.events.admin.OperationType;
-import org.keycloak.events.admin.ResourceType;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserModel;
 
-import javax.json.JsonObject;
-import java.util.List;
-import java.util.Map;
 
 public class CustomEventListenerProvider implements EventListenerProvider {
 
 	private static final Logger logger = Logger.getLogger(CustomEventListenerProvider.class);
-	private static final String SSO_ID_ATTRIBUTE = "ssoId";
 	private KeycloakSession session;
 	private RemoteSsoHandler handler;
 
