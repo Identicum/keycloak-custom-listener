@@ -2,6 +2,8 @@ package com.identicum.keycloak;
 
 import java.util.Map;
 import javax.json.JsonObject;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.pool.PoolStats;
 import org.jboss.logging.Logger;
 import org.keycloak.events.Event;
 import org.keycloak.events.EventListenerProvider;
@@ -9,19 +11,23 @@ import org.keycloak.events.EventType;
 import org.keycloak.events.admin.AdminEvent;
 import org.keycloak.models.KeycloakSession;
 
-
 public class CustomEventListenerProvider implements EventListenerProvider {
 
 	private static final Logger logger = Logger.getLogger(CustomEventListenerProvider.class);
-	private KeycloakSession session;
 	private RemoteSsoHandler handler;
 
-	public CustomEventListenerProvider(KeycloakSession session, RemoteSsoHandler handler) {
+	public CustomEventListenerProvider(KeycloakSession session, RemoteSsoHandler handler, PoolingHttpClientConnectionManager poolingHttpClientConnectionManager, Boolean statsEnabled) {
 		logger.infov("Initializing CustomEventListenerProvider.");
-		this.session = session;
 		this.handler = handler;
-		if (handler.isStatsEnabled()){
-			logger.infov("HTTP pool stats: {0}", handler.getStats().toString());
+		if (statsEnabled){
+			StringBuilder sb = new StringBuilder();
+			PoolStats poolStats = poolingHttpClientConnectionManager.getTotalStats();
+			sb.append("availableConnections: " + poolStats.getAvailable() + ", ");
+			sb.append("maxConnections: " + poolStats.getMax() + ", ");
+			sb.append("leasedConnections: " + poolStats.getLeased() + ", ");
+			sb.append("pendingConnections: " + poolStats.getPending() + ", ");
+			sb.append("defaultMaxPerRoute: " + poolingHttpClientConnectionManager.getDefaultMaxPerRoute());
+			logger.infov("HTTP pool stats: {0}", sb.toString());
 		}
 	}
 

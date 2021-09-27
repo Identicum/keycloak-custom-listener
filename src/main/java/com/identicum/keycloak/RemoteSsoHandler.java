@@ -1,19 +1,16 @@
 package com.identicum.keycloak;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import com.identicum.http.HttpTools;
 import com.identicum.http.SimpleHttpResponse;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.pool.PoolStats;
 import org.apache.http.protocol.HTTP;
 import org.jboss.logging.Logger;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 
 public class RemoteSsoHandler {
 
@@ -21,31 +18,14 @@ public class RemoteSsoHandler {
 
 	private String endpoint;
 	private CloseableHttpClient httpClient;
-	private Boolean statsEnabled;
 
-	public RemoteSsoHandler(CloseableHttpClient client, String endpoint, Boolean statsEnabled) {
+	public RemoteSsoHandler(CloseableHttpClient client, String endpoint) {
 		this.endpoint = endpoint;
 		this.httpClient = client;
-		this.statsEnabled = statsEnabled;
 	}
 
 	public CloseableHttpClient getHttpClient() {
 		return httpClient;
-	}
-
-	public Boolean isStatsEnabled() {
-		return this.statsEnabled;
-	}
-
-	public Map getStats() {
-		HashMap<String, Integer> stats = new HashMap<>();
-		PoolStats poolStats = this.poolingHttpClientConnectionManager.getTotalStats();
-		stats.put("availableConnections", poolStats.getAvailable());
-		stats.put("maxConnections", poolStats.getMax());
-		stats.put("leasedConnections", poolStats.getLeased());
-		stats.put("pendingConnections", poolStats.getPending());
-		stats.put("defaultMaxPerRoute", this.poolingHttpClientConnectionManager.getDefaultMaxPerRoute());
-		return stats;
 	}
 	
 	public JsonObject registerUser(String username, String realm) {

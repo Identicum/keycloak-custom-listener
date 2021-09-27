@@ -18,10 +18,12 @@ public class CustomEventListenerProviderFactory implements EventListenerProvider
 	private static final Logger logger = Logger.getLogger(CustomEventListenerProviderFactory.class);
 
 	private RemoteSsoHandler remoteSsoHandler;
+	private PoolingHttpClientConnectionManager poolingHttpClientConnectionManager;
+	private Boolean statsEnabled;
 
 	@Override
 	public EventListenerProvider create(KeycloakSession keycloakSession) {
-		return new CustomEventListenerProvider(keycloakSession, this.remoteSsoHandler);
+		return new CustomEventListenerProvider(keycloakSession, this.remoteSsoHandler, this.poolingHttpClientConnectionManager, this.statsEnabled);
 	}
 
 	@Override
@@ -32,12 +34,12 @@ public class CustomEventListenerProviderFactory implements EventListenerProvider
 		Integer connectTimeout = config.getInt("apiConnectTimeout", 2000);
 		Integer socketTimeout = config.getInt("apiSocketTimeout", 2000);
 		String statsEnabledString = config.get("httpStatsEnabled", "No");
-		Boolean statsEnabled = statsEnabledString.equals("Yes");
+		this.statsEnabled = statsEnabledString.equals("Yes");
 		logger.infov("Initializing HTTP pool with API endpoint: {0}, maxConnections: {1}, connectionRequestTimeout: {2}, connectTimeout: {3}, socketTimeout: {4}", endpoint, maxConnections, connectionRequestTimeout, connectTimeout, socketTimeout);
-		PoolingHttpClientConnectionManager poolingConnManager = new PoolingHttpClientConnectionManager();
-		poolingConnManager.setMaxTotal(maxConnections);
-		poolingConnManager.setDefaultMaxPerRoute(maxConnections);
-		poolingConnManager.setDefaultSocketConfig(SocketConfig.custom()
+		this.poolingHttpClientConnectionManager = new PoolingHttpClientConnectionManager();
+		this.poolingHttpClientConnectionManager.setMaxTotal(maxConnections);
+		this.poolingHttpClientConnectionManager.setDefaultMaxPerRoute(maxConnections);
+		this.poolingHttpClientConnectionManager.setDefaultSocketConfig(SocketConfig.custom()
 			.setSoTimeout(socketTimeout)
 			.build());
 		RequestConfig requestConfig = RequestConfig.custom()
@@ -46,9 +48,9 @@ public class CustomEventListenerProviderFactory implements EventListenerProvider
 			.build();
 		CloseableHttpClient httpClient = HttpClients.custom()
 			.setDefaultRequestConfig(requestConfig)
-			.setConnectionManager(poolingConnManager)
+			.setConnectionManager(this.poolingHttpClientConnectionManager)
 			.build();
-		this.remoteSsoHandler = new RemoteSsoHandler(httpClient, endpoint, statsEnabled);
+		this.remoteSsoHandler = new RemoteSsoHandler(httpClient, endpoint);
 	}
 
 	@Override
