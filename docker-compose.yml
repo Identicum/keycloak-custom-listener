@@ -13,6 +13,7 @@ services:
       API_SOCKET_TIMEOUT: 4500
       API_CONNECT_TIMEOUT: 1000
       API_CONNECTION_REQUEST_TIMEOUT: 1000
+      HTTP_STATS_ENABLED: 'Yes'
     volumes:
       - ./realm.json:/tmp/realm.json
       - ./target/keycloak-custom-listener.jar:/opt/jboss/keycloak/standalone/deployments/keycloak-custom-listener.jar

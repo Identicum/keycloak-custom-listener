@@ -31,6 +31,8 @@ public class CustomEventListenerProviderFactory implements EventListenerProvider
 		Integer connectionRequestTimeout = config.getInt("apiConnectionRequestTimeout", 2000);
 		Integer connectTimeout = config.getInt("apiConnectTimeout", 2000);
 		Integer socketTimeout = config.getInt("apiSocketTimeout", 2000);
+		String statsEnabledString = config.get("httpStatsEnabled", "No");
+		Boolean statsEnabled = statsEnabledString.equals("Yes");
 		logger.infov("Initializing HTTP pool with API endpoint: {0}, maxConnections: {1}, connectionRequestTimeout: {2}, connectTimeout: {3}, socketTimeout: {4}", endpoint, maxConnections, connectionRequestTimeout, connectTimeout, socketTimeout);
 		PoolingHttpClientConnectionManager poolingConnManager = new PoolingHttpClientConnectionManager();
 		poolingConnManager.setMaxTotal(maxConnections);
@@ -46,7 +48,7 @@ public class CustomEventListenerProviderFactory implements EventListenerProvider
 			.setDefaultRequestConfig(requestConfig)
 			.setConnectionManager(poolingConnManager)
 			.build();
-		this.remoteSsoHandler = new RemoteSsoHandler(httpClient, endpoint);
+		this.remoteSsoHandler = new RemoteSsoHandler(httpClient, endpoint, statsEnabled);
 	}
 
 	@Override

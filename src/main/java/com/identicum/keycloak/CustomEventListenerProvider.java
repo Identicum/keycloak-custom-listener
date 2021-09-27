@@ -20,6 +20,9 @@ public class CustomEventListenerProvider implements EventListenerProvider {
 		logger.infov("Initializing CustomEventListenerProvider.");
 		this.session = session;
 		this.handler = handler;
+		if (handler.isStatsEnabled()){
+			logger.infov("HTTP pool stats: {0}", handler.getStats().toString());
+		}
 	}
 
 	@Override
