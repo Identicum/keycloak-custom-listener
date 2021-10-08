@@ -1,19 +1,22 @@
 package com.identicum.keycloak;
 
-import java.util.Map;
-import javax.json.JsonObject;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.pool.PoolStats;
 import org.jboss.logging.Logger;
 import org.keycloak.events.Event;
 import org.keycloak.events.EventListenerProvider;
-import org.keycloak.events.EventType;
 import org.keycloak.events.admin.AdminEvent;
 import org.keycloak.models.KeycloakSession;
 
+import java.util.Map;
+
+import static org.jboss.logging.Logger.getLogger;
+import static org.keycloak.events.EventType.LOGIN;
+import static org.keycloak.events.EventType.REGISTER;
+
 public class CustomEventListenerProvider implements EventListenerProvider {
 
-	private static final Logger logger = Logger.getLogger(CustomEventListenerProvider.class);
+	private static final Logger logger = getLogger(CustomEventListenerProvider.class);
 	private RemoteSsoHandler handler;
 
 	public CustomEventListenerProvider(KeycloakSession session, RemoteSsoHandler handler, PoolingHttpClientConnectionManager poolingHttpClientConnectionManager, Boolean statsEnabled) {
@@ -34,12 +37,12 @@ public class CustomEventListenerProvider implements EventListenerProvider {
 	@Override
 	public void onEvent(Event event) {
 		logger.debugv("onEvent(Event): {0}", toString(event));
-		if(EventType.REGISTER.equals(event.getType())) {
+		if(REGISTER.equals(event.getType())) {
 			String username = event.getDetails().get("username");
 			logger.infov("Username created: {0}", username);
 			this.publishEvent(username, event);
 		}
-		else if(EventType.LOGIN.equals(event.getType())) {
+		else if(LOGIN.equals(event.getType())) {
 			String username = event.getDetails().get("username");
 			logger.debugv("User logged in: {0}", username);
 			this.publishEvent(username, event);
@@ -58,7 +61,7 @@ public class CustomEventListenerProvider implements EventListenerProvider {
 
 	private void publishEvent(String username, Event event) {
 		try {
-			JsonObject response = this.handler.registerUser(username, event.getRealmId());
+			this.handler.registerUser(username, event.getRealmId());
 		} catch (Exception e) {
 			logger.errorv("Error publishing user event {0}: {1}", username, e);
 		}

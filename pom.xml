@@ -44,6 +44,11 @@
 			<groupId>org.jboss.spec.javax.ws.rs</groupId>
 			<artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.10</version>
+		</dependency>
 	</dependencies>
 
 	<build>
