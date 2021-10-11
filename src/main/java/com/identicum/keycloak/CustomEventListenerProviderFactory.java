@@ -19,7 +19,7 @@ import static com.identicum.http.Constants.API_CONNECTION_REQUEST_TIMEOUT_DEFAUL
 import static com.identicum.http.Constants.API_CONNECT_TIMEOUT_DEFAULT;
 import static com.identicum.http.Constants.API_MAX_CONNECTIONS_DEFAULT;
 import static com.identicum.http.Constants.API_SOCKET_TIMEOUT_DEFAULT;
-import static com.identicum.http.Constants.HTTP_STATS_DELAY_TIME_SECS_DEFAULT;
+import static com.identicum.http.Constants.HTTP_STATS_INTERVAL_DEFAULT;
 import static com.identicum.http.Constants.TO_MILLISECONDS;
 import static com.identicum.http.HttpTools.closeQuietly;
 import static org.jboss.logging.Logger.getLogger;
@@ -30,7 +30,7 @@ public class CustomEventListenerProviderFactory implements EventListenerProvider
 
 	private RemoteSsoHandler remoteSsoHandler;
 	private PoolingHttpClientConnectionManager poolingHttpClientConnectionManager;
-	private Integer httpStatsDelayTimeSecs;
+	private Integer httpStatsInterval;
 	private Timer httpStats;
 
 	@Override
@@ -45,7 +45,7 @@ public class CustomEventListenerProviderFactory implements EventListenerProvider
 		Integer connectionRequestTimeout = config.getInt("apiConnectionRequestTimeout", API_CONNECTION_REQUEST_TIMEOUT_DEFAULT);
 		Integer connectTimeout = config.getInt("apiConnectTimeout", API_CONNECT_TIMEOUT_DEFAULT);
 		Integer socketTimeout = config.getInt("apiSocketTimeout", API_SOCKET_TIMEOUT_DEFAULT);
-		this.httpStatsDelayTimeSecs = config.getInt("httpStatsDelayTimeSecs", HTTP_STATS_DELAY_TIME_SECS_DEFAULT);
+		this.httpStatsInterval = config.getInt("httpStatsInterval", HTTP_STATS_INTERVAL_DEFAULT);
 		logger.infov("Initializing HTTP pool with API endpoint: {0}, maxConnections: {1}, connectionRequestTimeout: {2}, connectTimeout: {3}, socketTimeout: {4}", endpoint, maxConnections, connectionRequestTimeout, connectTimeout, socketTimeout);
 		this.poolingHttpClientConnectionManager = new PoolingHttpClientConnectionManager();
 		this.poolingHttpClientConnectionManager.setMaxTotal(maxConnections);
@@ -62,9 +62,9 @@ public class CustomEventListenerProviderFactory implements EventListenerProvider
 			.setConnectionManager(this.poolingHttpClientConnectionManager)
 			.build();
 		this.remoteSsoHandler = new RemoteSsoHandler(httpClient, endpoint);
-		if(httpStatsDelayTimeSecs > 0){
+		if(httpStatsInterval > 0){
 			this.httpStats = new Timer();
-			this.httpStats.schedule(new HttpStats(logger, poolingHttpClientConnectionManager), 0, httpStatsDelayTimeSecs * TO_MILLISECONDS);
+			this.httpStats.schedule(new HttpStats(logger, poolingHttpClientConnectionManager), 0, httpStatsInterval * TO_MILLISECONDS);
 		}
 	}
 

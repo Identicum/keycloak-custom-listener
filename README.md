@@ -42,6 +42,7 @@ In the sample configuration, this is done automatically, configured in ./startup
             <property name="apiConnectionRequestTimeout" value="2000"/>
             <property name="apiConnectTimeout" value="1000"/>
             <property name="apiSocketTimeout" value="1500"/>
+            <property name="httpStatsInterval" value="60"/>
         </properties>
     </provider>
 </spi>
