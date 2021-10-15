@@ -20,11 +20,11 @@ public class HttpStats extends TimerTask {
     public void run() {
         StringBuilder sb = new StringBuilder();
         PoolStats poolStats = poolingHttpClientConnectionManager.getTotalStats();
-        sb.append("availableConnections: " + poolStats.getAvailable() + ", ");
         sb.append("maxConnections: " + poolStats.getMax() + ", ");
+        sb.append("defaultMaxPerRoute: " + poolingHttpClientConnectionManager.getDefaultMaxPerRoute());
+        sb.append("availableConnections: " + poolStats.getAvailable() + ", ");
         sb.append("leasedConnections: " + poolStats.getLeased() + ", ");
         sb.append("pendingConnections: " + poolStats.getPending() + ", ");
-        sb.append("defaultMaxPerRoute: " + poolingHttpClientConnectionManager.getDefaultMaxPerRoute());
         logger.infov("HTTP pool stats: {0}", sb.toString());
     }
 }
